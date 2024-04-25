@@ -1,61 +1,70 @@
 import numpy as np
-from numpy.random import rand
-import random
+from random import random
+import matplotlib.pyplot as plt
 
 
-# Objective function (Binary Vector)
-def objective(solution):
-    # For simplicity, the objective function is a bit vector
-    return np.sum(solution)
+def objective(x):
+    mid_point = len(x) // 2
+    sum_first_half = np.sum(x[:mid_point])
+    sum_second_half = np.sum(x)
+    return (-sum_first_half, sum_second_half)
 
 
-# Simulated annealing algorithm
-def simulated_annealing(objective, solution_length, n_iterations, temp):
-    # Generate an initial solution
-    curr_solution = [random.choice([0, 1]) for _ in range(solution_length)]
+def generate_candidate(x):
+    new_x = np.copy(x)
+    for i in range(len(x)):
+        if random() < 1 / len(x):
+            new_x[i] = 1 - new_x[i]
+    return new_x
+
+
+def lexico_metropolis(curr_eval, candidate_eval, t):
+    for curr, cand in zip(curr_eval, candidate_eval):
+        if cand < curr:
+            return True
+        elif cand > curr:
+            return False
+    return np.exp((sum(curr_eval) - sum(candidate_eval)) / t) > random()
+
+
+def simulate_annealing(length_of_vector, max_iterations=1000, temp=1.0):
+    curr_solution = np.random.randint(0, 2, size=length_of_vector)
     curr_eval = objective(curr_solution)
-    best_solution = curr_solution
 
-    best_eval = curr_eval
-
-    for i in range(n_iterations):
-        # Generate a candidate solution by flipping a random bit
-        candidate_solution = curr_solution.copy()
-        index_to_flip = random.randint(0, solution_length - 1)
-        candidate_solution[index_to_flip] = 1 - candidate_solution[index_to_flip]
-
-        # Evaluate candidate solution
+    for i in range(1, max_iterations + 1):
+        t = temp / float(i + 1)
+        candidate_solution = generate_candidate(curr_solution)
         candidate_eval = objective(candidate_solution)
 
-        # Calculate temperature for current iteration
-        t = temp / float(i + 1)
-
-        # Calculate Metropolis acceptance criterion
-        metropolis = np.exp((curr_eval - candidate_eval) / t)
-
-        # Check if we should accept the candidate solution
-        if candidate_eval < curr_eval or rand() < metropolis:
+        if lexico_metropolis(curr_eval, candidate_eval, t):
             curr_solution = candidate_solution
             curr_eval = candidate_eval
 
-        # Update the best solution found so far
-        if candidate_eval < best_eval:
-            best_solution = candidate_solution
-            best_eval = candidate_eval
-
-    return best_solution, best_eval
+    return curr_eval
 
 
-# Set random seed for reproducibility
-random.seed(42)
+# Simulation parameters
+vector_lengths = [10, 20, 30,50,75,100]
+num_trials = 50  # Number of trials per vector length
+results = {length: [] for length in vector_lengths}
 
-# Define problem parameters
-solution_length = 10  # Length of the binary vector
-n_iterations = 1000  # Number of iterations
-temp = 1.0  # Initial temperature
+# Running the benchmark
+for length in vector_lengths:
+    for _ in range(num_trials):
+        results[length].append(simulate_annealing(length))
 
-# Perform simulated annealing optimization
-best_solution, best_score = simulated_annealing(objective, solution_length, n_iterations, temp)
+# Preparing data for boxplots
+objective_1 = {length: [-result[0] for result in results[length]] for length in vector_lengths}
+objective_2 = {length: [result[1] for result in results[length]] for length in vector_lengths}
 
-print("Best Solution:", best_solution)
-print("Objective Function Value:", best_score)
+# Plotting
+fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 12))
+for idx, obj in enumerate([objective_1, objective_2]):
+    axes[idx].boxplot([obj[length] for length in vector_lengths],
+                      labels=[f'{length} bits' for length in vector_lengths])
+    axes[idx].set_title(f'Objective {idx + 1} Values')
+    axes[idx].set_xlabel('Vector Length')
+    axes[idx].set_ylabel('Objective Value')
+
+plt.tight_layout()
+plt.show()
