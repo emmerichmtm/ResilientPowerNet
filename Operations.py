@@ -28,8 +28,8 @@ def build_graph(RootList, BusList, LineList):
 
 def count_connected(graph):
     connected = 0
-    for branch in graph:
-        connected += len(branch['buses'])
+    for buses in graph['buses']:
+        connected += len(buses)
     return connected
 
 
@@ -39,7 +39,3 @@ def set_priorities(buses, bus_priorities_list = None):
 
     for bus, priority in zip(buses, bus_priorities_list):
         bus.priority = priority
-
-# print(build_graph(RootList, BusList, LineList))
-
-
