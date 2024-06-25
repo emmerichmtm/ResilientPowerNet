@@ -1,7 +1,10 @@
 import numpy as np
 from random import random
 import matplotlib.pyplot as plt
-
+from Operations import *
+from IEEE69BusDist import *
+from DistribObjects import *
+from DistribObjects import Bus, Line
 
 def objective(x):
     mid_point = len(x) // 2
@@ -58,13 +61,12 @@ objective_1 = {length: [-result[0] for result in results[length]] for length in 
 objective_2 = {length: [result[1] for result in results[length]] for length in vector_lengths}
 
 # Plotting
-fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 12))
+fig, axes = plt.subplots(nrows=2, ncols=1, figsize=(10, 15))
 for idx, obj in enumerate([objective_1, objective_2]):
     axes[idx].boxplot([obj[length] for length in vector_lengths],
                       labels=[f'{length} bits' for length in vector_lengths])
-    axes[idx].set_title(f'Objective {idx + 1} Values')
     axes[idx].set_xlabel('Vector Length')
-    axes[idx].set_ylabel('Objective Value')
+    axes[idx].set_ylabel(f'Objective {idx + 1} Values')
+#plt.tight_layout()
 
-plt.tight_layout()
 plt.show()
