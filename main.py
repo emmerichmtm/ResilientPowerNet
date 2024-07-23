@@ -224,13 +224,13 @@ RootList = [Bus1]
 
 # Create an example of a bit vector with length 69 and mostly ones
 
+set_priorities(BusList)
 graph69 = build_graph(RootList, BusList, LineList)
 
 n = count_connected(graph69)
 print("connected nodes",n)
 i = local_search_with_connected_nodes(69, graph69)
 
-set_priorities(graph69['buses'][0])
 p = count_priorities(graph69)
 print("priorities",p)
 
@@ -254,3 +254,4 @@ set_priorities(graph69['buses'][0])
 priority_count = count_priorities(graph69)
 print(f"Priority 1 nodes: {priority_count[1]}")
 print(f"Priority 2 nodes: {priority_count[2]}")
+

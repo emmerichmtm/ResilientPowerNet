@@ -1,7 +1,6 @@
 from IEEE69BusDist import *
 import numpy as np
 
-
 """ Objective function for the local search algorithm building a graph of connected to the root nodes 
 and not considering the lines that are not in the bitmask """
 def build_graph(RootList, BusList, LineList, line_bitmask=None):
@@ -35,17 +34,15 @@ def build_graph(RootList, BusList, LineList, line_bitmask=None):
     return graph
 
 
-
 def count_connected(graph):
     connected = 0
     for buses in graph['buses']:
         connected += len(buses)
     return connected
 
-
-def set_priorities(buses, bus_priorities_list = None):
+def set_priorities(buses, bus_priorities_list=None):
     if bus_priorities_list is None:
-        bus_priorities_list = np.random.randint(0,2,len(buses))
+        bus_priorities_list = np.random.randint(0, 2, len(buses))
 
     for bus, priority in zip(buses, bus_priorities_list):
         bus.priority = priority
@@ -59,3 +56,5 @@ def count_priorities(graph):
             elif bus.priority == 1:
                 priority_count[2] += 1
     return priority_count
+
+
