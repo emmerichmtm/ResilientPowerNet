@@ -118,7 +118,7 @@ class Capacitor:
     capacitorCount = 0
     def __init__(self, bus, capstat = 1, vref=0.0, blockSize = 0.0, numBlocks = 1):
         self.bus = bus
-        selv.capstat = capstat
+        self.capstat = capstat
         self.vref = vref
         self.blockSize = blockSize
         self.numBlocks = numBlocks
