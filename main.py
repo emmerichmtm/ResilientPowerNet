@@ -233,7 +233,13 @@ print("priorities",p)
 
 # Create a bit vector with length 69, mostly ones
 # The bits denote whether or not the lines are on or off
-bit_vector_69 = [1] * 64 + [0, 0, 1, 0, 1,0,0,0,1]  # 65 ones and 4 zeros
+# Use the lines.ibstat attribute to set the initial state of the lines
+# 1 means the line is on, 0 means the line is off
+bit_vector_69 = [line.ibstat for line in LineList]
+# print the index of open switches
+print("open switches", [i for i, x in enumerate(bit_vector_69) if x == 0])
+
+#bit_vector_69 = [1] * 64 + [0,0,1,0,1,0,0,0,1]  # 65 ones and 4 zeros
 
 # Ensure the bit vector has the correct length
 assert len(bit_vector_69) == len(LineList)
@@ -262,11 +268,7 @@ def objective_weighted_sum(RootList, BusList, LineList, x):
 # Test the objective function and output the result with some description
 print("Objective function value:")
 print(objective_weighted_sum(RootList, BusList, LineList, bit_vector_69))
-
-
-
-
-
+print("open switches", [i for i, x in enumerate(bit_vector_69) if x == 0])
 # ---------------------- Run the local search algorithm ----------------------
 
 # Example mask with length 69 (allow changes only where mask[i] == 1)
@@ -279,8 +281,6 @@ optimized_vector, optimized_objective = local_search_with_mask(start_switch_vect
 
 # ---------------------- Output the results ----------------------
 
-
-
 # Output the optimized bit vector and its objective function value
 print("Optimized bit vector:", optimized_vector)
 print("Length of optimized bit vector:", len(optimized_vector))
@@ -291,8 +291,6 @@ print("Optimized objective function value:", optimized_objective)
 # Build the graph with the optimized bit vector
 graph69 = build_graph(RootList, BusList, LineList, optimized_vector)
 
-
-
 # Count the connected buses
 connected_count = count_connected(graph69)
 print(f"Total connected buses: {connected_count}")
@@ -301,3 +299,5 @@ print(f"Total connected buses: {connected_count}")
 priority_count = count_priorities(graph69)
 print(f"Priority 1 nodes: {priority_count[1]}")
 print(f"Priority 2 nodes: {priority_count[2]}")
+
+
