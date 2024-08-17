@@ -5,6 +5,7 @@ from Operations import *
 from IEEE69BusDist import *
 from DistribObjects import *
 from DistribObjects import Bus, Line
+from LocalSearchSimple import local_search_with_mask
 
 def objective(x):
     mid_point = len(x) // 2
