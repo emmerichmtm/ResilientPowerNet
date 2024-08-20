@@ -57,4 +57,9 @@ def count_priorities(graph):
                 priority_count[2] += 1
     return priority_count
 
-
+def short_circular_check(graph):
+    new_graph = build_graph(graph['root'], graph['buses'], graph['lines'], line_bitmask=None)
+    for new_graph_lines, graph_lines in zip(new_graph['lines'], graph['lines']):
+        if len(new_graph_lines) != len(graph_lines):
+            return False
+    return True

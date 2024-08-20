@@ -249,5 +249,3 @@ print(f"Total connected buses: {connected_count}")
 priority_count = count_priorities(graph69)
 print(f"Priority 1 nodes: {priority_count[1]}")
 print(f"Priority 2 nodes: {priority_count[2]}")
-
-
