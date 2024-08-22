@@ -226,6 +226,8 @@ print("open switches", [i for i, x in enumerate(bit_vector_69) if x == 0])
 # mask = [1] * (len(LineList))
 # In this example, allow changes everywhere, except in the last 4 bits
 mask = [1] * (len(LineList)-4) + [0,0,0,0]
+LineList[46].disrupted = 1
+
 start_switch_vector = bit_vector_69  # 65 ones and 4 zeros (length 73)
 optimized_vector, optimized_objective = local_search_with_mask(start_switch_vector, mask, RootList, BusList, LineList)
 

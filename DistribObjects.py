@@ -55,10 +55,11 @@ class Line:
     'Common base class for all distribution lines'
     lineCount = 0
 
-    def __init__(self, fbus, tbus, r, x, ibstat=1):
+    def __init__(self, fbus, tbus, r, x, ibstat=1, disrupted=0):
         self.fbus = fbus # From bus
         self.tbus = tbus # To bus
         self.ibstat = ibstat
+        self.disrupted = disrupted
         self.r = r
         self.x = x
         self.ibstat = ibstat
