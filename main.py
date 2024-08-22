@@ -176,88 +176,190 @@ LineList = [L1, L2, L3, L4, L5, L6, L7, L8, L9, L10,
 RootList = [Bus1]
 
 # Create an example of a bit vector with length 69 and mostly ones
+def test_single_disruption(RootList, BusList, LineList, disrupted_index):
+    """
+    Function to test the effect of a single line disruption and optimize the network configuration.
 
-set_priorities(BusList)
-graph69 = build_graph(RootList, BusList, LineList)
+    Parameters:
+    - RootList: List of root buses.
+    - BusList: List of all buses in the network.
+    - LineList: List of all lines in the network.
+    - disrupted_index: Index of the line that is disrupted (1-based index).
 
-n = count_connected(graph69)
-#print("connected nodes",n)
-#i = local_search_with_connected_nodes(69, graph69)
+    Outputs:
+    - Prints the initial and optimized network status including connected buses and priority nodes.
+    """
 
-p = count_priorities(graph69)
-print("priorities",p)
+    # Set priorities for buses
+    set_priorities(BusList)
 
-# Create a bit vector with length 69, mostly ones
-# The bits denote whether or not the lines are on or off
-# Use the lines.ibstat attribute to set the initial state of the lines
-# 1 means the line is on, 0 means the line is off
-bit_vector_69 = [line.ibstat for line in LineList]
-# print the index of open switches
-print("open switches", [i for i, x in enumerate(bit_vector_69) if x == 0])
+    # Build the graph from the initial setup
+    graph69 = build_graph(RootList, BusList, LineList)
 
-#bit_vector_69 = [1] * 64 + [0,0,1,0,1,0,0,0,1]  # 65 ones and 4 zeros
+    # Count the number of connected buses initially
+    connected_count = count_connected(graph69)
+    print(f"Total connected buses initially: {connected_count}")
 
-# Ensure the bit vector has the correct length
-assert len(bit_vector_69) == len(LineList)
+    # Count priority 1 and priority 2 nodes initially
+    priority_count = count_priorities(graph69)
+    print(f"Priority 1 nodes initially: {priority_count[1]}")
+    print(f"Priority 2 nodes initially: {priority_count[2]}")
 
-# Build the graph with the line bitmask
-graph69 = build_graph(RootList, BusList, LineList, bit_vector_69)
+    # ---------------------- Create Bit Vector ----------------------
 
-# Count the connected buses
-connected_count = count_connected(graph69)
-print(f"Total connected buses: {connected_count}")
+    # Initialize a bit vector based on the initial line statuses
+    bit_vector_69 = [line.ibstat for line in LineList]
 
-# Set priorities for the buses in the first subgraph
-set_priorities(graph69['buses'][0])
+    # Output the indices of the initially open switches
+    open_switches = [i for i, x in enumerate(bit_vector_69) if x == 0]
+    print("Initial open switches:", open_switches)
 
-# Count priority 1 and priority 2 nodes
-priority_count = count_priorities(graph69)
-print(f"Priority 1 nodes: {priority_count[1]}")
-print(f"Priority 2 nodes: {priority_count[2]}")
+    # Rebuild the graph with the bit vector applied (initial state)
+    graph69 = build_graph(RootList, BusList, LineList, bit_vector_69)
 
-# Test the objective function and output the result with some description
-print("Objective function value:")
-print(objective_weighted_sum(RootList, BusList, LineList, bit_vector_69))
-print("open switches", [i for i, x in enumerate(bit_vector_69) if x == 0])
-# ---------------------- Run the local search algorithm ----------------------
+    # Count the connected buses with the current bit vector
+    connected_count = count_connected(graph69)
+    print(f"Total connected buses after applying bit vector: {connected_count}")
 
-# Example mask with length 69 (allow changes only where mask[i] == 1)
-# In this example, allow changes everywhere
-# mask = [1] * (len(LineList))
-# In this example, allow changes everywhere, except in the last 4 bits
-mask = [0] * (len(LineList))
-# set mask = 1 where switches are open
-for i in range(len(LineList)):
-    if LineList[i].ibstat == 0:
-        mask[i] = 1
+    # Recalculate priorities after applying the bit vector
+    priority_count = count_priorities(graph69)
+    print(f"Priority 1 nodes: {priority_count[1]}")
+    print(f"Priority 2 nodes: {priority_count[2]}")
+
+    # ---------------------- Local Search Optimization ----------------------
+
+    # Create a mask to allow changes only where switches are initially open
+    mask = [0] * len(LineList)
+    for i in range(len(LineList)):
+        if LineList[i].ibstat == 0:
+            mask[i] = 1
+
+    # Mark the specified line as disrupted
+    LineList[disrupted_index - 1].disrupted = 1
+    print(f"Disrupted line index: {disrupted_index}")
+    print(f"From bus: {LineList[disrupted_index - 1].fbus}, To bus: {LineList[disrupted_index - 1].tbus}")
+
+    # Perform local search to optimize the network configuration
+    optimized_vector, optimized_objective = local_search_with_mask(bit_vector_69, mask, RootList, BusList, LineList)
+
+    # ---------------------- Output the Optimized Results ----------------------
+
+    # Output the optimized bit vector and its objective function value
+    print("Optimized bit vector:", optimized_vector)
+    print("Length of optimized bit vector:", len(optimized_vector))
+    print("Number of closed switches (sum of optimized bit vector):", sum(optimized_vector))
+    print("Optimized objective function value:", optimized_objective)
+
+    # Rebuild the graph with the optimized bit vector
+    graph69 = build_graph(RootList, BusList, LineList, optimized_vector)
+
+    # Count the connected buses after optimization
+    connected_count = count_connected(graph69)
+    print(f"Total connected buses after optimization: {connected_count}")
+
+    # Count priority 1 and priority 2 nodes after optimization
+    priority_count = count_priorities(graph69)
+    print(f"Priority 1 nodes after optimization: {priority_count[1]}")
+    print(f"Priority 2 nodes after optimization: {priority_count[2]}")
 
 
-disrupted_index = 27
-LineList[disrupted_index-1].disrupted = 1
-print("disrupted",LineList[45].disrupted)
-print("tbus",LineList[45].tbus)
-print("fbus",LineList[45].fbus)
+# Define your RootList, BusList, and LineList here
+RootList = [BusList[0]]  # Example setup for the root
+disrupted_index = 27  # Example disrupted line index
 
-start_switch_vector = bit_vector_69  # 65 ones and 4 zeros (length 73)
-optimized_vector, optimized_objective = local_search_with_mask(start_switch_vector, mask, RootList, BusList, LineList)
-
-# ---------------------- Output the results ----------------------
-
-# Output the optimized bit vector and its objective function value
-print("Optimized bit vector:", optimized_vector)
-print("Length of optimized bit vector:", len(optimized_vector))
-print("Sum of optimized bit vector (Number of closed switches):", sum(optimized_vector))
-print("Optimized objective function value:", optimized_objective)
+# Call the test function
+test_single_disruption(RootList, BusList, LineList, disrupted_index)
 
 
-# Build the graph with the optimized bit vector
-graph69 = build_graph(RootList, BusList, LineList, optimized_vector)
+def generate_latex_table_with_optimization(LineList, RootList, BusList):
+    """
+    Generates a LaTeX table for the specified lines in the list after running local search optimization,
+    simulating a disruption on each line one at a time, and sorting by the total score (lowest first)
+    and then by line index.
 
-# Count the connected buses
-connected_count = count_connected(graph69)
-print(f"Total connected buses: {connected_count}")
+    Columns:
+    - Line Index
+    - Line FBus
+    - Line TBus
+    - Number of Connected Priority Nodes
+    - Total Number of Connected Nodes
+    - Aggregated Score (Example: sum of priorities of connected buses)
 
-# Count priority 1 and priority 2 nodes
-priority_count = count_priorities(graph69)
-print(f"Priority 1 nodes: {priority_count[1]}")
-print(f"Priority 2 nodes: {priority_count[2]}")
+    Parameters:
+    - LineList: List of all lines in the network.
+    - RootList: List of root buses.
+    - BusList: List of all buses in the network.
+
+    Returns:
+    - A string containing the LaTeX table.
+    """
+
+    results = []
+
+    # Iterate over each line in LineList, simulating a disruption for each
+    for i, line in enumerate(LineList):
+        # Reset the disruption status for all lines
+        for l in LineList:
+            l.disrupted = 0
+
+        # Mark the current line as disrupted
+        LineList[i].disrupted = 1
+
+        # Initialize the bit vector based on the initial ibstat values
+        bit_vector_69 = [line.ibstat for line in LineList]
+
+        # Create a mask to allow changes only where switches are initially open
+        mask = [0] * len(LineList)
+        for j in range(len(LineList)):
+            if LineList[j].ibstat == 0:
+                mask[j] = 1
+
+        # Perform local search to optimize the network configuration
+        optimized_vector, optimized_objective = local_search_with_mask(bit_vector_69, mask, RootList, BusList, LineList)
+
+        # Reinitialize the switches based on the optimized vector
+        for j in range(len(LineList)):
+            LineList[j].ibstat = optimized_vector[j]
+
+        # Build the graph with the optimized vector applied
+        graph = build_graph(RootList, BusList, LineList, optimized_vector)
+        connected_count = count_connected(graph)
+        priority_count = count_priorities(graph)
+        aggregated_score = sum(priority_count.values())  # Example: summing priority 1 and priority 2 nodes
+
+        # Store the result in a list for sorting later
+        results.append(
+            (i + 1, line.fbus, line.tbus, priority_count[1] + priority_count[2], connected_count, aggregated_score))
+
+    # Sort results by aggregated score (ascending) and then by line index (ascending)
+    results.sort(key=lambda x: (x[5], x[0]))
+
+    # Header for the LaTeX table
+    table = (
+        "\\begin{table}[ht]\n"
+        "\\centering\n"
+        "\\begin{tabular}{|c|c|c|c|c|c|}\n"
+        "\\hline\n"
+        "Line Index & FBus & TBus & Connected Priority Nodes & Total Connected Nodes & Aggregated Score \\\\\n"
+        "\\hline\n"
+    )
+
+    # Populate the LaTeX table with sorted results
+    for result in results:
+        table += f"{result[0]} & {result[1]} & {result[2]} & {result[3]} & {result[4]} & {result[5]} \\\\\n"
+
+    # Footer for the LaTeX table
+    table += (
+        "\\hline\n"
+        "\\end{tabular}\n"
+        "\\caption{Network Analysis for Each Line After Optimization (Sorted by Score)}\n"
+        "\\label{tab:network_analysis_optimized_sorted}\n"
+        "\\end{table}\n"
+    )
+
+    return table
+
+
+# Example usage
+latex_table = generate_latex_table_with_optimization(LineList, RootList, BusList)
+print(latex_table)
