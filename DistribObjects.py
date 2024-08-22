@@ -50,6 +50,7 @@ class Bus:
         self.tolinelist = []
         self.nextbus = []
         Bus.busCount += 1
+        self.priority = 1
 
 class Line:
     'Common base class for all distribution lines'

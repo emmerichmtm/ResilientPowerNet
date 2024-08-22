@@ -283,7 +283,7 @@ def generate_latex_table_with_optimization(LineList, RootList, BusList):
     - Line TBus
     - Number of Connected Priority Nodes
     - Total Number of Connected Nodes
-    - Aggregated Score (Example: sum of priorities of connected buses)
+    - Aggregated Score (5 * Connected Priority Nodes + (Total Connected Nodes - Connected Priority Nodes))
 
     Parameters:
     - LineList: List of all lines in the network.
@@ -325,11 +325,12 @@ def generate_latex_table_with_optimization(LineList, RootList, BusList):
         graph = build_graph(RootList, BusList, LineList, optimized_vector)
         connected_count = count_connected(graph)
         priority_count = count_priorities(graph)
-        aggregated_score = sum(priority_count.values())  # Example: summing priority 1 and priority 2 nodes
+
+        connected_priority_nodes = priority_count[1] + priority_count[2]
+        aggregated_score = 5 * connected_priority_nodes + (connected_count - connected_priority_nodes)
 
         # Store the result in a list for sorting later
-        results.append(
-            (i + 1, line.fbus, line.tbus, priority_count[1] + priority_count[2], connected_count, aggregated_score))
+        results.append((i + 1, line.fbus, line.tbus, connected_priority_nodes, connected_count, aggregated_score))
 
     # Sort results by aggregated score (ascending) and then by line index (ascending)
     results.sort(key=lambda x: (x[5], x[0]))
