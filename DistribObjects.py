@@ -17,7 +17,7 @@ class Bus:
     'Common base class for all distribution buses'
     busCount = 0
 
-    def __init__(self, busnum, pload=0.0, qload=0.0, ZIP=[0.0, 0.0 ,1.0], vset=0.0, iloss=0, pqcostRatio=100):
+    def __init__(self, busnum, pload=0.0, qload=0.0, ZIP=[0.0, 0.0 ,1.0], vset=0.0, iloss=0, pqcostRatio=100,priority=0):
         self.busnum = busnum
         self.pload = pload
         self.qload = qload
@@ -50,7 +50,7 @@ class Bus:
         self.tolinelist = []
         self.nextbus = []
         Bus.busCount += 1
-        self.priority = 1
+        self.priority = priority
 
 class Line:
     'Common base class for all distribution lines'

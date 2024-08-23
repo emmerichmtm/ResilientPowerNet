@@ -9,7 +9,7 @@ from LocalSearchSimple import local_search_with_mask, objective_weighted_sum
 
 
 # Buses and loads
-Bus1 = Bus(1, 0, 0)
+Bus1 = Bus(1, 0, 0,priority=1) # high priority bus, generator
 Bus2= Bus(2, 0,	0)
 Bus3 = Bus(3, 0, 0)
 Bus4 = Bus(4, 0, 0)
@@ -40,7 +40,7 @@ Bus28 = Bus(28, 0.026,	0.0186)
 Bus29 = Bus(29, 0.026,	0.0186)
 Bus30 = Bus(30, 0,	0)
 Bus31 = Bus(31, 0,	0)
-Bus32 = Bus(32, 0,	0)
+Bus32 = Bus(32, 0,	0, priority=1) # high priority bus
 Bus33 = Bus(33, 0.014,	0.01)
 Bus34 = Bus(34, 0.0195,	0.014)
 Bus35= Bus(35, 0.006,	0.004)
@@ -66,7 +66,7 @@ Bus54 = Bus(54, 0.0264,	0.019)
 Bus55 = Bus(55, 0.024,	0.0172)
 Bus56 = Bus(56, 0,	0)
 Bus57 = Bus(57, 0,	0)
-Bus58 = Bus(58, 0,	0)
+Bus58 = Bus(58, 0,	0) # high priority bus
 Bus59 = Bus(59, 0.1,	0.072, iloss = 0)
 Bus60 = Bus(60, 0,	0)
 Bus61 = Bus(61, 1.244,	0.888, iloss = 0)
@@ -78,7 +78,7 @@ Bus65 = Bus(65, 0.059,	0.042, iloss = 0)
 #Bus65 = Bus(65, -1.4,	0.042)
 Bus66 = Bus(66, 0.018,	0.013)
 Bus67 = Bus(67, 0.018,	0.013)
-Bus68 = Bus(68, 0.028,	0.02)
+Bus68 = Bus(68, 0.028,	0.02, priority=1)
 Bus69 = Bus(69, 0.028,	0.02)
 
 
@@ -268,7 +268,7 @@ RootList = [BusList[0]]  # Example setup for the root
 disrupted_index = 27  # Example disrupted line index
 
 # Call the test function
-test_single_disruption(RootList, BusList, LineList, disrupted_index)
+#test_single_disruption(RootList, BusList, LineList, disrupted_index)
 
 
 def generate_latex_table_with_optimization(LineList, RootList, BusList):
@@ -326,8 +326,8 @@ def generate_latex_table_with_optimization(LineList, RootList, BusList):
         connected_count = count_connected(graph)
         priority_count = count_priorities(graph)
 
-        connected_priority_nodes = priority_count[1] + priority_count[2]
-        aggregated_score = 5 * connected_priority_nodes + (connected_count - connected_priority_nodes)
+        connected_priority_nodes = priority_count[2]
+        aggregated_score = 4 * connected_priority_nodes + connected_count
 
         # Store the result in a list for sorting later
         results.append((i + 1, line.fbus, line.tbus, connected_priority_nodes, connected_count, aggregated_score))

@@ -50,7 +50,7 @@ def objective_weighted_sum(RootList, BusList, LineList, x):
         #print("in objective_weighted_sum, diff = ", diff)
         return -abs(diff)
 
-    return priority_count[1] * 100 + priority_count[2]
+    return priority_count[1] + 5 * priority_count[2]
 
 def local_search_with_mask(start_switch_vector, mask, RootList, BusList, LineList, max_iterations=1000):
     """ Local search algorithm with a mask that restricts the changes that can be made to the bit vector.
