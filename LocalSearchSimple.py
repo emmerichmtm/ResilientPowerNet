@@ -29,27 +29,17 @@ def objective_weighted_sum(RootList, BusList, LineList, x):
     buses_connected = 0
     for buses in graph69['buses']:
         buses_connected += len(buses)
-        print("connected buses",buses_connected)
     #  Same for lines
-
     lines_connected = 0
     for lines in graph69['lines']:
         lines_connected += len(lines)
-        #print("connected lines",lines_connected)
 
     diff = buses_connected - (lines_connected+1)
     #print("diff = ", diff)
     if diff != 0:
-        # print breakdown of the difference     diff = (len(graph69['lines'])-1) - (len(graph69['buses']))
-        # print  diff, (len(graph69['lines'])-1), (len(graph69['buses']))
-        #print("len(graph69['lines'])-1 = ", (len(graph69['lines'])-1))
-        #print("len(graph69['buses']) = ", len(graph69['buses']))
-        #print("in objective_weighted_sum, diff = ", diff)
-
-
-        #print("in objective_weighted_sum, diff = ", diff)
         return -abs(diff)
 
+    # Return the weighted sum of the two priority counts
     return priority_count[1] + 5 * priority_count[2]
 
 def local_search_with_mask(start_switch_vector, mask, RootList, BusList, LineList, max_iterations=1000):

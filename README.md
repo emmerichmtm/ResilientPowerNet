@@ -1,4 +1,4 @@
-Resilience analysis of Power Distribution Systems
+Recoverable Robustness Analysis of Power Distribution Systems
 ---------------------------------------------------------------------------------------------------------
 Adaptation/Extension of the PySDAL library for simulating the power flow of a power distribution network.
 Find details in this paper:
@@ -27,6 +27,48 @@ This function:
 - Simulates a line disruption and adjusts the network switches defined in mask accordingly.
 - Optimizes the network using a local search algorithm.
 - Outputs the number of connected buses and priority nodes before and after optimization.
+
+### generate_latex_table_with_optimization(LineList, RootList, BusList)
+
+ Description:
+ The `generate_latex_table_with_optimization` function generates a LaTeX    
+ table that provides an optimized ranking of network lines based on a       
+ simulated recoverable robustness performs a local search        
+ optimization, simulating a disruption on each line one at a time, and then 
+ sorts the results by the total aggregated score (in ascending order) and   
+ by the line index.                                                         
+
+ Table Columns:
+ The generated LaTeX table includes the following columns:                  
+ - **Line Index:** The index of the line being analyzed.                    
+ - **Line FBus:** The "from" bus of the line.                               
+ - **Line TBus:** The "to" bus of the line.                                 
+ - **Number of Connected Priority Nodes:** The number of priority nodes     
+   connected to the line.                                                   
+ - **Total Number of Connected Nodes:** The total number of nodes connected 
+   to the line.                                                             
+ - **Aggregated Score:** A calculated score based on the formula:           
+   `Aggregated Score = 5 * Number of Connected Priority Nodes +             
+   (Total Connected Nodes - Number of Connected Priority Nodes)`            
+   This score helps in prioritizing lines with higher importance based on   
+   their connected nodes.                                                   
+
+ Parameters:                                                                
+ - `LineList` (list): A list containing all the lines in the network.       
+ - `RootList` (list): A list containing the root buses of the network.      
+ - `BusList` (list): A list containing all the buses in the network.        
+
+ Returns:                                                                   
+ - `str`: A string containing the LaTeX formatted table, which can be       
+   directly used in LaTeX documents.                                        
+
+ Example Usage:
+ ```python                                                                  
+ latex_table = generate_latex_table_with_optimization(LineList, RootList,   
+ BusList)                                                                   
+ print(latex_table)                                                         
+ This function is particularly useful in power network analysis, where
+ prioritization of lines based on their importance can significantly impact the network's resilience and optimization.
 
 ## Contributing
 
