@@ -1,7 +1,6 @@
-#!/usr/bin/python
-
-import numpy as np
+from IEEE69BusDist import *
 from DistribObjects import *
+from DistribObjects import Bus, Line
 
 # Buses and loads
 Bus1 = Bus(1, 0, 0)
@@ -168,9 +167,4 @@ LineList = [L1, L2, L3, L4, L5, L6, L7, L8, L9, L10,
             L53, L54, L55, L56, L57, L58, L59, L60, L61, L62, L63, L64,
             L65, L66, L67, L68, LL69, LL70, LL71, LL72, LL73]
 
-
 RootList = [Bus1]
-
-# Reactive Power Compensation / Voltage control
-#svc1 = SVC(bus=61, vref=0.97, injQmax = 1.0, injQmin = 0.0, slopeQ = 0.05)
-#Bus61.comp = svc1
